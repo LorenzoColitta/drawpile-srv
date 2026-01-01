@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BOT_NAME="KeepAliveBot"
-SERVER_URL="localhost:27750"
+SERVER_URL="wss://localhost:${PORT:-10000}"
 CMD_PATH="./squashfs-root/usr/bin/drawpile-cmd"
 
 declare -A user_counts
@@ -20,7 +20,7 @@ while read -r line; do
         
         if [ -z "${user_counts["$sid"]}" ]; then user_counts["$sid"]=0; fi
         ((user_counts["$sid"]++))
-        echo "[Monitor] User '$user' joined '$sid'.  Humans: ${user_counts["$sid"]}"
+        echo "[Monitor] User '$user' joined '$sid'.   Humans: ${user_counts["$sid"]}"
         
         if [ -n "${bot_pids["$sid"]}" ] && kill -0 "${bot_pids["$sid"]}" 2>/dev/null; then
             echo "[Monitor] Terminating bot for '$sid'"
@@ -36,11 +36,11 @@ while read -r line; do
         
         ((user_counts["$sid"]--))
         if [ ${user_counts["$sid"]} -lt 0 ]; then user_counts["$sid"]=0; fi
-        echo "[Monitor] User '$user' left '$sid'.  Humans: ${user_counts["$sid"]}"
+        echo "[Monitor] User '$user' left '$sid'.   Humans: ${user_counts["$sid"]}"
         
         if [ "${user_counts["$sid"]}" -eq 0 ]; then
             echo "[Monitor] Starting bot for '$sid'..."
-            xvfb-run -a "$CMD_PATH" --join "drawpile://$SERVER_URL/$sid" --headless --username "$BOT_NAME" >/dev/null 2>&1 &
+            xvfb-run -a "$CMD_PATH" --join "$SERVER_URL/$sid" --headless --username "$BOT_NAME" >/dev/null 2>&1 &
             bot_pids["$sid"]=$!
         fi
     fi
