@@ -1,0 +1,14 @@
+;
+; Drawpile Session Template
+; This template creates persistent sessions by default
+; Useful for Android clients that lack the 'Persistent' checkbox
+;
+[session]
+title = Default Persistent Session
+persistent = true
+maxUserCount = 254
+allowDrawing = true
+allowWebClients = true
+
+[founder]
+allowModOps = true
