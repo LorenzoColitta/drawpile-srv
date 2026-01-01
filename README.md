@@ -47,8 +47,8 @@ The server is configured with:
 
 - **Server Version**: Drawpile 2.2.1
 - **Platform**: Ubuntu 22.04 via Docker
-- **Port**: 27750 (configurable via `PORT` env var)
-- **Backup Strategy**: Incremental backups to Appwrite Storage
+- **Port**: 27750
+- **Backup Strategy**: Full backups to Appwrite Storage every 10 seconds
 - **Disk Space**: 1GB persistent disk on Render
 
 ## Troubleshooting
