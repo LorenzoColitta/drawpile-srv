@@ -1,37 +1,29 @@
 FROM ubuntu:22.04
 
-# Install dependencies for Drawpile and AppImage extraction
+# 1. Install all system dependencies required by the Drawpile binary (Qt/OpenGL)
 RUN apt-get update && apt-get install -y \
+    libgl1 \
+    libglib2.0-0 \
+    libfontconfig1 \
+    libdbus-1-3 \
+    libicu70 \
     wget \
-    libqt5core5a \
-    libqt5network5 \
-    libqt5sql5 \
-    libqt5sql5-sqlite \
-    libqt5websockets5 \
-    ca-certificates \
-    binutils \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /home/drawpile
+# 2. Download the official 2.2.1 AppImage
+RUN wget https://github.com/drawpile/Drawpile/releases/download/2.2.1/Drawpile-2.2.1-x86_64.AppImage -O /drawpile.AppImage
+RUN chmod +x /drawpile.AppImage
 
-# Download the official 2.2.1 AppImage (contains the server with WS support)
-RUN wget https://github.com/drawpile/Drawpile/releases/download/2.2.1/Drawpile-2.2.1-x86_64.AppImage \
-    && chmod +x Drawpile-2.2.1-x86_64.AppImage
+# 3. Extract the AppImage so we can run the binary directly
+RUN /drawpile.AppImage --appimage-extract
 
-# Extract the AppImage so we can run the server binary directly (FUSE doesn't work in Docker)
-RUN ./Drawpile-2.2.1-x86_64.AppImage --appimage-extract
+# 4. Prepare directories
+RUN mkdir /sessions
+WORKDIR /
 
-# Create sessions directory
-RUN mkdir sessions
+# 5. Set environment for headless execution
+ENV QT_QPA_PLATFORM=offscreen
 
-# Start the server
-# 1. We move the internal TCP port to 27750
-# 2. we bind the WEBSOCKET server to the Render $PORT. 
-# This handles the HTTP health check and allows browser clients.
-CMD sh -c "./squashfs-root/usr/bin/drawpile-srv \
-    --database /home/drawpile/drawpile.db \
-    --sessions /home/drawpile/sessions \
-    --listen 127.0.0.1 \
-    --port 27750 \
-    --websocket-listen 0.0.0.0 \
-    --websocket-port ${PORT:-10000}"
+# 6. Start the server
+# We use Render's $PORT for the WebSocket server (required for the health check)
+CMD sh -c "./squashfs-root/usr/bin/drawpile-srv --database /drawpile.db --sessions /sessions --listen 0.0.0.0 --port 27751 --websocket-listen 0.0.0.0 --websocket-port ${PORT:-10000}"
