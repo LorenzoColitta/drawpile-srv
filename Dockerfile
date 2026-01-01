@@ -16,5 +16,6 @@ RUN chmod +x /home/drawpile/*.sh
 
 USER drawpile
 RUN mkdir -p /home/drawpile/data/sessions
+COPY --chown=drawpile:drawpile templates/ /home/drawpile/data/templates/
 
 CMD ["./entrypoint.sh"]

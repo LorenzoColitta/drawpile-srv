@@ -52,6 +52,7 @@ ROLLOVER_PID=$!
 # Start Drawpile server in background
 ./squashfs-root/usr/bin/drawpile-srv \
     --config /home/drawpile/drawpile.cfg \
+    --templates /home/drawpile/data/templates \
     --listen 0.0.0.0 \
     --port 27750 &
 SERVER_PID=$!
