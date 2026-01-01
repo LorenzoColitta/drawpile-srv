@@ -26,8 +26,8 @@ RUN wget https://github.com/drawpile/Drawpile/releases/download/2.2.1/Drawpile-2
 
 # Copy scripts
 COPY --chown=drawpile: drawpile sync-to-appwrite.sh /home/drawpile/sync-to-appwrite.sh
-COPY --chown=drawpile:drawpile monitor-sessions.sh /home/drawpile/monitor-sessions. sh
-RUN chmod +x /home/drawpile/*. sh
+COPY --chown=drawpile:drawpile monitor-sessions.sh /home/drawpile/monitor-sessions.sh
+RUN chmod +x /home/drawpile/*.sh
 
 USER drawpile
 RUN mkdir -p /home/drawpile/data/sessions
