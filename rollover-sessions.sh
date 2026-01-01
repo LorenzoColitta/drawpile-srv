@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Enable nullglob to handle cases where no session files exist
+shopt -s nullglob
+
 SESSION_DIR="/home/drawpile/data/sessions"
 ROLLOVER_THRESHOLD=252000  # 70 hours in seconds (before 72h timeout)
 
@@ -15,8 +18,8 @@ while true; do
         
         session_id=$(basename "$session_file" .session)
         
-        # Skip archived sessions (those with .archived extension)
-        [[ "$session_id" == *".archived"* ]] && continue
+        # Skip archived sessions (those with .archived extension in the basename)
+        [[ "$session_id" == *.archived ]] && continue
         
         # Get file age in seconds
         file_age=$(($(date +%s) - $(stat -c %Y "$session_file")))
@@ -29,9 +32,12 @@ while true; do
             # Create timestamped backup name
             backup_name="${session_id}_backup_$(date +%Y%m%d_%H%M%S)"
             
+            # Collect all session-related files
+            session_files=("$SESSION_DIR/${session_id}".*)
+            
             # Copy all session-related files to backup
             file_count=0
-            for file in "$SESSION_DIR/${session_id}".*; do
+            for file in "${session_files[@]}"; do
                 [ -f "$file" ] || continue
                 
                 ext="${file##*.}"
@@ -40,7 +46,7 @@ while true; do
             done
             
             # Reset timestamps on original files to extend their life
-            for file in "$SESSION_DIR/${session_id}".*; do
+            for file in "${session_files[@]}"; do
                 [ -f "$file" ] || continue
                 touch "$file"
             done
