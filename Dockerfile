@@ -11,10 +11,10 @@ COPY --chown=drawpile:drawpile sync-to-appwrite.sh /home/drawpile/sync-to-appwri
 COPY --chown=drawpile:drawpile drawpile.cfg /home/drawpile/drawpile.cfg
 COPY --chown=drawpile:drawpile rollover-sessions.sh /home/drawpile/rollover-sessions.sh
 COPY --chown=drawpile:drawpile entrypoint.sh /home/drawpile/entrypoint.sh
-COPY --chown=drawpile:drawpile templates/ /home/drawpile/data/templates/
 RUN chmod +x /home/drawpile/*.sh
 
 USER drawpile
 RUN mkdir -p /home/drawpile/data/sessions
+COPY --chown=drawpile:drawpile templates/ /home/drawpile/data/templates/
 
 CMD ["./entrypoint.sh"]
