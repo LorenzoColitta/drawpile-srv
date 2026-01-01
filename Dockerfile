@@ -29,7 +29,7 @@ RUN wget https://github.com/drawpile/Drawpile/releases/download/2.2.1/Drawpile-2
     && chown -R drawpile:drawpile /home/drawpile
 
 # 4. Create backup script that syncs to Appwrite Storage
-COPY --chown=drawpile: drawpile sync-to-appwrite.sh /home/drawpile/sync-to-appwrite. sh
+COPY --chown=drawpile:drawpile sync-to-appwrite.sh /home/drawpile/sync-to-appwrite.sh
 RUN chmod +x /home/drawpile/sync-to-appwrite.sh
 
 USER drawpile
