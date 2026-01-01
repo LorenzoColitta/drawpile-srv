@@ -37,7 +37,7 @@ RUN mkdir -p /data
 EXPOSE 27750
 
 CMD ["drawpile-srv", \
-     "--database", "/data/drawpile. db", \
+     "--database", "/data/drawpile.db", \
      "--sessions", \
      "--session-timeout", "0", \
      "--port", "27750", \
