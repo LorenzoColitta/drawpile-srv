@@ -15,12 +15,17 @@ shutdown() {
         kill $SERVER_PID 2>/dev/null
     fi
     
-    # Run final backup
+    # Run final backup with timeout
     echo "Running final backup..."
-    if ./sync-to-appwrite.sh backup; then
+    if timeout 180 ./sync-to-appwrite.sh backup; then
         echo "Final backup completed successfully"
     else
-        echo "ERROR: Final backup failed - data may not be preserved" >&2
+        EXIT_CODE=$?
+        if [ $EXIT_CODE -eq 124 ]; then
+            echo "ERROR: Final backup timed out after 180 seconds" >&2
+        else
+            echo "ERROR: Final backup failed - data may not be preserved" >&2
+        fi
     fi
     
     echo "Shutdown complete"

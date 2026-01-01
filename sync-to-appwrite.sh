@@ -37,7 +37,7 @@ backup() {
         -H "X-Appwrite-Project: ${APPWRITE_PROJECT_ID}" \
         -H "X-Appwrite-Key: ${APPWRITE_API_KEY}" 2>/dev/null
     
-    UPLOAD_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+    UPLOAD_RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 120 --retry 2 -X POST \
         "${APPWRITE_ENDPOINT}/storage/buckets/${APPWRITE_BUCKET_ID}/files" \
         -H "X-Appwrite-Project: ${APPWRITE_PROJECT_ID}" \
         -H "X-Appwrite-Key: ${APPWRITE_API_KEY}" \
@@ -57,7 +57,7 @@ backup() {
             -H "X-Appwrite-Key: ${APPWRITE_API_KEY}" 2>/dev/null
         
         # Upload with the permanent ID
-        FINAL_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+        FINAL_RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 120 --retry 2 -X POST \
             "${APPWRITE_ENDPOINT}/storage/buckets/${APPWRITE_BUCKET_ID}/files" \
             -H "X-Appwrite-Project: ${APPWRITE_PROJECT_ID}" \
             -H "X-Appwrite-Key: ${APPWRITE_API_KEY}" \
