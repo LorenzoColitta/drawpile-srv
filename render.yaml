@@ -1,9 +1,16 @@
 services:
   - type: web
-      name: drawpile-server
-          env:  docker
-              plan: free
-                  dockerfilePath: ./Dockerfile
-                      envVars:
-                            - key:  PORT
-                                    value: 27750
+    name: drawpile-srv
+    runtime: docker
+    plan: free
+    region: oregon
+    branch: main
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key:  PORT
+        value: 27750
+    disk: 
+      name: drawpile-data
+      mountPath: /home/drawpile
+      sizeGB: 1
+    startCommand: drawpile-srv --listen 0.0.0.0 --port $PORT --database /home/drawpile/drawpile.db --sessions /home/drawpile/sessions --session-timeout 3h --verbose
