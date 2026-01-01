@@ -3,6 +3,11 @@ FROM ubuntu:22.04
 # 1. Install system libraries + curl for Appwrite API
 RUN apt-get update && apt-get install -y \
     wget \
+FROM ubuntu:22.04
+
+# 1. Install system libraries + curl for Appwrite API
+RUN apt-get update && apt-get install -y \
+    wget \
     curl \
     jq \
     libgl1 \
@@ -37,6 +42,14 @@ CMD sh -c "./sync-to-appwrite.sh restore && \
     ./squashfs-root/usr/bin/drawpile-srv \
     --database /home/drawpile/data/drawpile.db \
     --sessions /home/drawpile/data/sessions \
+    --listen 127.0.0.1 \
+    --port 27750 \
+    --websocket-listen 0.0.0.0 \
+    --websocket-port ${PORT:-10000} & \
+    SERVER_PID=\$! && \
+    while kill -0 \$SERVER_PID 2>/dev/null; do \
+        sleep 300 && ./sync-to-appwrite.sh backup; \
+    done"essions \
     --listen 127.0.0.1 \
     --port 27750 \
     --websocket-listen 0.0.0.0 \
