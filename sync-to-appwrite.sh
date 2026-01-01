@@ -12,7 +12,7 @@ FILE_ID="drawpile-sessions-latest"
 
 backup() {
     echo "Creating backup..."
-    tar -czf "$BACKUP_FILE" -C "$DATA_DIR" . 
+    tar -czf "$BACKUP_FILE" -C "$DATA_DIR" .  
     
     # Delete old backup from Appwrite
     curl -X DELETE \
@@ -49,7 +49,7 @@ restore() {
         rm "$BACKUP_FILE"
         echo "Restore complete!"
     else
-        echo "No existing backup found. Starting fresh."
+        echo "No existing backup found.  Starting fresh."
         mkdir -p "$DATA_DIR/sessions"
     fi
 }
