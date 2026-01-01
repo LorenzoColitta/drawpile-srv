@@ -1,4 +1,4 @@
-FROM ubuntu: 22.04
+FROM ubuntu:22.04
 
 # Install FUSE, Drawpile dependencies, and xvfb for headless bot
 RUN apt-get update && apt-get install -y \
@@ -22,7 +22,7 @@ WORKDIR /home/drawpile
 RUN wget https://github.com/drawpile/Drawpile/releases/download/2.2.1/Drawpile-2.2.1-x86_64.AppImage \
     && chmod +x Drawpile-2.2.1-x86_64.AppImage \
     && ./Drawpile-2.2.1-x86_64.AppImage --appimage-extract \
-    && chown -R drawpile: drawpile /home/drawpile
+    && chown -R drawpile:drawpile /home/drawpile
 
 # Copy scripts
 COPY --chown=drawpile: drawpile sync-to-appwrite.sh /home/drawpile/sync-to-appwrite.sh
@@ -35,7 +35,7 @@ RUN mkdir -p /home/drawpile/data/sessions
 # Start with session monitoring for all sessions
 CMD sh -c "./sync-to-appwrite.sh restore && \
     (while true; do sleep 10 && ./sync-to-appwrite.sh backup; done) & \
-    BACKUP_PID=\$! && \
+    BACKUP_PID=\$!  && \
     ./squashfs-root/usr/bin/drawpile-srv \
     --database /home/drawpile/data/drawpile.db \
     --sessions /home/drawpile/data/sessions \
