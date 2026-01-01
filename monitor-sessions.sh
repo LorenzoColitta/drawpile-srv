@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BOT_NAME="KeepAliveBot"
-SERVER_URL="wss://localhost:${PORT:-10000}"
+SERVER_URL="drawpile://localhost: 27750"
 CMD_PATH="./squashfs-root/usr/bin/drawpile-cmd"
 
 declare -A user_counts
@@ -12,11 +12,11 @@ echo "[Monitor] Starting session monitor - bot joins all sessions..."
 while read -r line; do
     echo "$line"
     
-    if [[ "$line" =~ Info/Join.*\ ([^@]+)@([^: ]+):\ Joined\ session ]]; then
+    if [[ "$line" =~ Info/Join.*\ ([^@]+)@([^:  ]+):\ Joined\ session ]]; then
         user="${BASH_REMATCH[1]}"
         sid="${BASH_REMATCH[2]}"
         
-        echo "[Monitor] Detected:  user='$user' sid='$sid'"
+        echo "[Monitor] Detected:   user='$user' sid='$sid'"
         
         if [ "$user" == "$BOT_NAME" ]; then 
             echo "[Monitor] Bot joined, ignoring"
@@ -32,7 +32,7 @@ while read -r line; do
         fi
         
         ((user_counts["$sid"]++))
-        echo "[Monitor] User '$user' in '$sid'.  Humans: ${user_counts["$sid"]}"
+        echo "[Monitor] User '$user' in '$sid'.   Humans: ${user_counts["$sid"]}"
         
     elif [[ "$line" =~ Info/Leave.*\ ([^@]+)@([^:]+):\ Left\ session ]]; then
         user="${BASH_REMATCH[1]}"
@@ -44,6 +44,6 @@ while read -r line; do
         
         ((user_counts["$sid"]--))
         if [ ${user_counts["$sid"]} -lt 0 ]; then user_counts["$sid"]=0; fi
-        echo "[Monitor] User '$user' left '$sid'. Humans: ${user_counts["$sid"]}"
+        echo "[Monitor] User '$user' left '$sid'.  Humans: ${user_counts["$sid"]}"
     fi
 done
