@@ -25,6 +25,9 @@ WORKDIR /home/drawpile
 FROM ubuntu:22.04
 
 # Install FUSE and other dependencies
+FROM ubuntu:22.04
+
+# Install FUSE and other dependencies
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
@@ -49,6 +52,26 @@ RUN wget https://github.com/drawpile/Drawpile/releases/download/2.2.1/Drawpile-2
 
 # Copy backup script
 COPY --chown=drawpile:drawpile sync-to-appwrite.sh /home/drawpile/sync-to-appwrite.sh
+RUN chmod +x /home/drawpile/sync-to-appwrite.sh
+
+USER drawpile
+
+# Create storage directories
+RUN mkdir -p /home/drawpile/data/sessions
+
+# Start server with 10-second backup interval
+CMD sh -c "./sync-to-appwrite.sh restore && \
+    ./squashfs-root/usr/bin/drawpile-srv \
+    --database /home/drawpile/data/drawpile.db \
+    --sessions /home/drawpile/data/sessions \
+    --listen 0.0.0.0 \
+    --port 27750 \
+    --websocket-listen 0.0.0.0 \
+    --websocket-port ${PORT:-10000} & \
+    SERVER_PID=\$!  && \
+    while kill -0 \$SERVER_PID 2>/dev/null; do \
+        sleep 10 && ./sync-to-appwrite.sh backup; \
+    done"nc-to-appwrite.sh
 RUN chmod +x /home/drawpile/sync-to-appwrite. sh
 
 USER drawpile
