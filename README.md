@@ -37,10 +37,10 @@ A persistent Drawpile collaborative drawing server deployed on Render with Appwr
 ## Configuration
 
 The server is configured with:
-- **Persistence**: Enabled (`--persistence true`)
+- **Persistence**: Enabled (`--persistent`)
 - **Session Storage**: File-backed at `/home/drawpile/data/sessions`
 - **Database**: SQLite at `/home/drawpile/data/drawpile.db`
-- **Idle Timeout**: 72 hours (`--idle-time-limit 72h`)
+- **Idle Timeout**: 72 hours (`--idle-timeout 259200` seconds)
 - **Backup Frequency**: Every 10 seconds to Appwrite
 
 ## Technical Details

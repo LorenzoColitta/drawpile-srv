@@ -13,4 +13,4 @@ RUN chmod +x /home/drawpile/*.sh
 USER drawpile
 RUN mkdir -p /home/drawpile/data/sessions
 
-CMD sh -c "./sync-to-appwrite.sh restore && (while true; do sleep 10 && ./sync-to-appwrite.sh backup; done) & BACKUP_PID=\$! && ./squashfs-root/usr/bin/drawpile-srv --database /home/drawpile/data/drawpile.db --sessions /home/drawpile/data/sessions --listen 0.0.0.0 --port 27750 --persistence true --idle-time-limit 72h --verbose; kill \$BACKUP_PID"
+CMD sh -c "./sync-to-appwrite.sh restore && (while true; do sleep 10 && ./sync-to-appwrite.sh backup; done) & BACKUP_PID=\$! && ./squashfs-root/usr/bin/drawpile-srv --database /home/drawpile/data/drawpile.db --sessions /home/drawpile/data/sessions --listen 0.0.0.0 --port 27750 --persistent --idle-timeout 259200; kill \$BACKUP_PID"
