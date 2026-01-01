@@ -17,7 +17,11 @@ shutdown() {
     
     # Run final backup
     echo "Running final backup..."
-    ./sync-to-appwrite.sh backup
+    if ./sync-to-appwrite.sh backup; then
+        echo "Final backup completed successfully"
+    else
+        echo "ERROR: Final backup failed - data may not be preserved" >&2
+    fi
     
     echo "Shutdown complete"
     exit 0

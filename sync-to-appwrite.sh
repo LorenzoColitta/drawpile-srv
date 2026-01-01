@@ -17,16 +17,14 @@ backup() {
     if [ -f "$DATA_DIR/drawpile.db" ]; then
         echo "Creating safe SQLite backup..."
         sqlite3 "$DATA_DIR/drawpile.db" ".backup '$DATA_DIR/drawpile.db.bak'"
-        # Replace original with backup for tarring
-        mv "$DATA_DIR/drawpile.db.bak" "$DATA_DIR/drawpile.db.tar-safe"
     fi
     
-    # Create tar backup (excluding the live database, including the safe copy)
-    tar -czf "$BACKUP_FILE" -C "$DATA_DIR" --exclude='drawpile.db' .
-    
-    # Clean up temporary database copy
-    if [ -f "$DATA_DIR/drawpile.db.tar-safe" ]; then
-        rm "$DATA_DIR/drawpile.db.tar-safe"
+    # Create tar backup (excluding the live database if it exists)
+    if [ -f "$DATA_DIR/drawpile.db.bak" ]; then
+        tar -czf "$BACKUP_FILE" -C "$DATA_DIR" --exclude='drawpile.db' --transform='s/drawpile.db.bak/drawpile.db/' .
+        rm "$DATA_DIR/drawpile.db.bak"
+    else
+        tar -czf "$BACKUP_FILE" -C "$DATA_DIR" .
     fi
     
     # Upload new backup with temporary ID first (ensures we have a backup before deleting old one)
@@ -59,20 +57,25 @@ backup() {
             -H "X-Appwrite-Key: ${APPWRITE_API_KEY}" 2>/dev/null
         
         # Upload with the permanent ID
-        curl -s -X POST \
+        FINAL_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
             "${APPWRITE_ENDPOINT}/storage/buckets/${APPWRITE_BUCKET_ID}/files" \
             -H "X-Appwrite-Project: ${APPWRITE_PROJECT_ID}" \
             -H "X-Appwrite-Key: ${APPWRITE_API_KEY}" \
             -F "fileId=${FILE_ID}" \
-            -F "file=@${BACKUP_FILE}" 2>/dev/null
+            -F "file=@${BACKUP_FILE}")
         
-        # Clean up temp backup
-        curl -s -X DELETE \
-            "${APPWRITE_ENDPOINT}/storage/buckets/${APPWRITE_BUCKET_ID}/files/${TEMP_FILE_ID}" \
-            -H "X-Appwrite-Project: ${APPWRITE_PROJECT_ID}" \
-            -H "X-Appwrite-Key: ${APPWRITE_API_KEY}" 2>/dev/null
+        FINAL_HTTP_CODE=$(echo "$FINAL_RESPONSE" | tail -n1)
         
-        echo "Backup complete!"
+        if [ "$FINAL_HTTP_CODE" = "201" ]; then
+            # Clean up temp backup
+            curl -s -X DELETE \
+                "${APPWRITE_ENDPOINT}/storage/buckets/${APPWRITE_BUCKET_ID}/files/${TEMP_FILE_ID}" \
+                -H "X-Appwrite-Project: ${APPWRITE_PROJECT_ID}" \
+                -H "X-Appwrite-Key: ${APPWRITE_API_KEY}" 2>/dev/null
+            echo "Backup complete!"
+        else
+            echo "Warning: Final upload failed (HTTP $FINAL_HTTP_CODE), but temp backup exists at ${TEMP_FILE_ID}"
+        fi
     else
         echo "Upload failed (HTTP $HTTP_CODE), old backup remains intact"
     fi
