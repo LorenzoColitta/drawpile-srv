@@ -8,7 +8,7 @@ WORKDIR /home/drawpile
 RUN wget https://github.com/drawpile/Drawpile/releases/download/2.2.1/Drawpile-2.2.1-x86_64.AppImage && chmod +x Drawpile-2.2.1-x86_64.AppImage && ./Drawpile-2.2.1-x86_64.AppImage --appimage-extract && chown -R drawpile:drawpile /home/drawpile
 
 COPY --chown=drawpile:drawpile sync-to-appwrite.sh /home/drawpile/sync-to-appwrite.sh
-COPY --chown=drawpile:drawpile monitor-sessions. sh /home/drawpile/monitor-sessions.sh
+COPY --chown=drawpile:drawpile monitor-sessions.sh /home/drawpile/monitor-sessions.sh
 RUN chmod +x /home/drawpile/*.sh
 
 USER drawpile
